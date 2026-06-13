@@ -1,693 +1,1645 @@
 <!DOCTYPE html>
-<html>
+<html lang="id" class="h-full">
 <head>
-<meta charset="UTF-8">
-<title>CoupleGram</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:#0b0b0b;
-color:white;
-}
-
-#app{display:none;}
-
-.center{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-}
-
-input,button{
-padding:10px;
-margin:5px;
-width:260px;
-border-radius:8px;
-border:none;
-outline:none;
-box-sizing:border-box;
-}
-
-input{
-background:#222;
-color:white;
-border:1px solid #333;
-}
-
-button{
-background:#ff2d75;
-color:white;
-cursor:pointer;
-font-weight:bold;
-transition: background 0.2s;
-}
-
-button:hover{
-background:#e02463;
-}
-
-.post,.storyBox{
-background:#1a1a1a;
-margin:10px;
-padding:10px;
-border-radius:12px;
-border: 1px solid #222;
-}
-
-img,video{width:100%;border-radius:10px;}
-
-nav{
-position:fixed;
-bottom:0;
-width:100%;
-display:flex;
-background:#111;
-border-top:1px solid #222;
-z-index: 100;
-}
-
-nav button{
-flex:1;
-background:none;
-color:#888;
-padding:15px;
-margin:0;
-border-radius:0;
-font-size:12px;
-}
-
-nav button.active {
-color: #ff2d75;
-font-weight: bold;
-}
-
-.msg{
-padding:8px;
-margin:5px;
-border-radius:10px;
-max-width:70%;
-word-break: break-word;
-font-size: 14px;
-}
-
-.me{background:#ff2d75;margin-left:auto;}
-.you{background:#333;}
-
-#typing{
-font-size:12px;
-opacity:0.7;
-padding:5px;
-color: #ff2d75;
-min-height: 18px;
-}
-
-/* Toast Notifikasi Custom */
-#toastBox {
-position: fixed;
-top: 20px;
-left: 50%;
-transform: translateX(-50%);
-background: #ff2d75;
-color: white;
-padding: 10px 20px;
-border-radius: 20px;
-font-size: 13px;
-font-weight: bold;
-z-index: 999;
-display: none;
-box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlastiGo Pro - Aplikasi Penjualan Toko Plastik</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;750;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receipt-modal-content, #receipt-modal-content * {
+                visibility: visible;
+            }
+            #receipt-modal-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
+<body class="h-full bg-slate-950 text-slate-100 overflow-hidden flex flex-col md:flex-row">
 
-<body>
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-64 bg-slate-900 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-800 shrink-0 z-10">
+        <div>
+            <!-- Brand Header -->
+            <div class="p-5 flex items-center space-x-3 border-b border-slate-800">
+                <div class="bg-emerald-500 text-slate-950 p-2 rounded-xl font-extrabold text-xl flex items-center justify-center shadow-lg shadow-emerald-500/10">
+                    <i data-lucide="package" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-white">PlastiGo <span class="text-emerald-400">Pro</span></h1>
+                    <span class="text-xs text-slate-400">Sales & Inventory Toko</span>
+                </div>
+            </div>
 
-<!-- NOTIFIKASI TOAST -->
-<div id="toastBox"></div>
+            <!-- Nav Items -->
+            <nav class="p-4 space-y-1 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap">
+                    <i data-lucide="layout-dashboard" class="w-4.5 h-4.5"></i>
+                    <span class="ml-2 md:ml-0">Dashboard Analisa</span>
+                </button>
 
-<!-- LOGIN -->
-<div id="login" class="center">
-<h2>CoupleGram 💕 v4</h2>
-<input id="email" placeholder="email (misal: romi@love.com)">
-<input id="password" type="password" placeholder="password">
-<button onclick="register()">Register Account</button>
-<button onclick="login()">Login</button>
-<div style="font-size: 10px; color: #555; margin-top: 15px;">Data akun disimpan aman di cloud & local</div>
-</div>
+                <button onclick="switchTab('pos')" id="nav-pos" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap">
+                    <i data-lucide="shopping-cart" class="w-4.5 h-4.5"></i>
+                    <span class="ml-2 md:ml-0">Kasir Penjualan</span>
+                </button>
 
-<!-- APP -->
-<div id="app">
+                <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="boxes" class="w-4.5 h-4.5"></i>
+                        <span class="ml-2 md:ml-0">Atur Stok Barang</span>
+                    </div>
+                    <span id="low-stock-badge-nav" class="hidden bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-2">0</span>
+                </button>
 
-<!-- Header Status Pasangan Real-time -->
-<div style="padding: 12px; background: #111; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;">
-  <span style="font-weight: bold; color: #ff2d75; font-size: 15px;">CoupleGram 💕</span>
-  <span id="partnerStatusHeader" style="font-size: 11px; color: #aaa;">Mengecek pasangan...</span>
-</div>
+                <button onclick="switchTab('history')" id="nav-history" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap">
+                    <i data-lucide="history" class="w-4.5 h-4.5"></i>
+                    <span class="ml-2 md:ml-0">Riwayat Penjualan</span>
+                </button>
 
-<div id="stories" style="display:flex; overflow-x:auto; padding:5px;"></div>
-
-<!-- Ditambahkan padding-bottom agar tidak tertutup nav bar bawah -->
-<div id="feed" style="padding-bottom: 80px;"></div>
-
-<div id="chat" style="display:none; padding:10px; padding-bottom:80px;">
-<div id="chatBox" style="height:55vh; overflow-y:auto; display:flex; flex-direction:column; padding-bottom:10px;"></div>
-<div id="typing"></div>
-<div style="display:flex; gap:5px;">
-<input id="msg" placeholder="chat..." oninput="typing()" style="flex:1; width:auto; margin:0;">
-<button onclick="sendMsg()" style="width:70px; margin:0;">Send</button>
-</div>
-</div>
-
-<!-- Ditambahkan padding-bottom agar tidak tertutup nav bar bawah -->
-<div id="upload" style="display:none; padding:15px; padding-bottom:80px;">
-<h3>Bagikan Momen Romantis</h3>
-<input type="file" id="file" accept="image/*" style="background:transparent; border:none; padding:5px;">
-<div style="font-size:11px; color:#666; margin: 2px 5px 10px 5px;">Pilih foto dari galeri Anda (Akan dikompres otomatis)</div>
-<input id="caption" placeholder="caption">
-<button onclick="uploadPost()">Upload Post</button>
-<button onclick="uploadStory()">Upload Story (24h)</button>
-</div>
-
-<nav>
-<button id="nav-feed" onclick="show('feed')" class="active">Home</button>
-<button id="nav-chat" onclick="show('chat')">Chat</button>
-<button id="nav-upload" onclick="show('upload')">Upload</button>
-<button onclick="logout()" style="color:#ff3b30; flex:0.5;">Logout</button>
-</nav>
-
-</div>
-
-<!-- FIREBASE SDK COMPAT -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script>
-/* 🔥 FIREBASE CONFIG */
-const firebaseConfig = typeof __firebase_config !== 'undefined' 
-  ? JSON.parse(__firebase_config) 
-  : {
-      apiKey: "AIzaSyFakeKey_ForCouplegramDemo_12345",
-      authDomain: "couplegram-v4.firebaseapp.com",
-      projectId: "couplegram-v4",
-      storageBucket: "couplegram-v4.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:1234567890abcdef"
-    };
-
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'couplegram-default-app';
-
-// Inisialisasi Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-let user = null;
-let isAuthReady = false;
-
-/* Toast Utility */
-function showNotification(text) {
-  const box = document.getElementById("toastBox");
-  box.innerText = text;
-  box.style.display = "block";
-  setTimeout(() => {
-    box.style.display = "none";
-  }, 3000);
-}
-
-/* AUTHENTICATION INITIALIZATION (Rule 3) */
-async function initAuth() {
-  auth.onAuthStateChanged(async (firebaseUser) => {
-    isAuthReady = true;
-    if (!firebaseUser) {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await auth.signInWithCustomToken(__initial_auth_token);
-        } else {
-          await auth.signInAnonymously();
-        }
-      } catch (e) {
-        console.warn("Gagal inisialisasi auth latar belakang:", e);
-      }
-    }
-
-    // Cek jika akun tersimpan sebelumnya di localStorage
-    const savedUser = localStorage.getItem("couplegram_saved_user");
-    if (savedUser) {
-      user = savedUser;
-      startApp();
-    }
-  });
-}
-
-/* DAFTAR AKUN BARU */
-function register(){
-  if (!isAuthReady) {
-    showNotification("Menyiapkan koneksi aman, tunggu sebentar...");
-    return;
-  }
-
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const emailVal = emailInput.value.trim();
-  const passVal = passwordInput.value.trim();
-
-  if(!emailVal || !passVal) {
-    showNotification("Email dan password harus diisi!");
-    return;
-  }
-
-  showNotification("Mendaftarkan akun...");
-  
-  // Simpan kredensial akun ke database Firestore publik agar aman & terpusat
-  const cleanKey = emailVal.replace(/[^a-zA-Z0-9]/g, "_");
-  const userRef = db.collection("artifacts").doc(appId).collection("public").doc("data").collection("users").doc(cleanKey);
-
-  userRef.get().then(docSnap => {
-    if (docSnap.exists()) {
-      showNotification("Email ini sudah terdaftar!");
-    } else {
-      userRef.set({
-        email: emailVal,
-        password: passVal,
-        time: Date.now()
-      }).then(() => {
-        showNotification("Pendaftaran Berhasil! Silakan klik Login.");
-      }).catch(err => {
-        showNotification("Error: " + err.message);
-      });
-    }
-  }).catch(err => {
-    showNotification("Gagal terhubung ke database: " + err.message);
-  });
-}
-
-/* MASUK AKUN */
-function login(){
-  if (!isAuthReady) {
-    showNotification("Menyiapkan koneksi aman, tunggu sebentar...");
-    return;
-  }
-
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const emailVal = emailInput.value.trim();
-  const passVal = passwordInput.value.trim();
-
-  if(!emailVal || !passVal) {
-    showNotification("Email dan password harus diisi!");
-    return;
-  }
-
-  showNotification("Memverifikasi login...");
-
-  const cleanKey = emailVal.replace(/[^a-zA-Z0-9]/g, "_");
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("users").doc(cleanKey).get()
-  .then(docSnap => {
-    if (docSnap.exists() && docSnap.data().password === passVal) {
-      user = emailVal;
-      // Menyimpan info akun ke localStorage agar tidak ter-logout saat refresh halaman
-      localStorage.setItem("couplegram_saved_user", emailVal);
-      startApp();
-      showNotification("Selamat datang kembali 💕");
-    } else {
-      showNotification("Email atau password salah!");
-    }
-  }).catch(err => {
-    showNotification("Gagal login: " + err.message);
-  });
-}
-
-/* LOGOUT */
-function logout() {
-  if (user) {
-    setOnline(false);
-  }
-  localStorage.removeItem("couplegram_saved_user");
-  user = null;
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login").style.display = "flex";
-  showNotification("Berhasil keluar.");
-}
-
-function startApp() {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  setOnline(true);
-  loadPosts();
-  loadChat();
-  loadStories();
-  listenToTyping();
-  listenToPartnerStatus(); // Mulai memantau status pasangan
-}
-
-/* ONLINE STATUS */
-function setOnline(status){
-  if (!user) return;
-  const cleanKey = user.replace(/[^a-zA-Z0-9]/g, "_");
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("status").doc(cleanKey).set({
-    user: user,
-    online: status,
-    time: Date.now()
-  }).catch(e => console.warn("Gagal memperbarui status kehadiran:", e));
-}
-
-/* INDIKATOR STATUS ONLINE PASANGAN */
-function listenToPartnerStatus() {
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("status")
-  .onSnapshot(snap => {
-    const header = document.getElementById("partnerStatusHeader");
-    let partnerOnline = false;
-    let partnerEmail = "";
-    let lastActive = null;
-
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.user !== user) {
-        partnerEmail = d.user;
-        if (d.online) {
-          partnerOnline = true;
-        } else {
-          lastActive = d.time;
-        }
-      }
-    });
-
-    if (partnerOnline) {
-      header.innerHTML = `<span style="color: #4cd137;">● ${partnerEmail.split('@')[0]} aktif</span>`;
-    } else if (partnerEmail) {
-      const timeStr = lastActive ? new Date(lastActive).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : "baru-baru ini";
-      header.innerHTML = `<span style="color: #888;">○ ${partnerEmail.split('@')[0]} off (${timeStr})</span>`;
-    } else {
-      header.innerHTML = `<span style="color: #555;">Menanti pasangan...</span>`;
-    }
-  }, error => {
-    console.error("Gagal mendengarkan status online pasangan:", error);
-  });
-}
-
-/* NAVIGASI SINGLE PAGE */
-function show(x){
-  document.getElementById("feed").style.display = x == "feed" ? "block" : "none";
-  document.getElementById("chat").style.display = x == "chat" ? "block" : "none";
-  document.getElementById("upload").style.display = x == "upload" ? "block" : "none";
-
-  // Atur kelas tombol aktif
-  document.getElementById("nav-feed").classList.toggle("active", x == "feed");
-  document.getElementById("nav-chat").classList.toggle("active", x == "chat");
-  document.getElementById("nav-upload").classList.toggle("active", x == "upload");
-
-  if(x == "chat") {
-    const chatBox = document.getElementById("chatBox");
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }
-}
-
-/* PEMBANTU KONVERSI FILE KE BASE64 DENGAN KOMPRESI (Mencegah Firestore Overload) */
-function getFileBase64(fileEl) {
-  return new Promise((resolve) => {
-    const f = fileEl.files[0];
-    if (!f) {
-      // Sediakan gambar romantis default jika tidak mengunggah apa pun
-      resolve("https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&auto=format&fit=crop&q=60");
-      return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        // Buat kanvas untuk kompresi gambar (maksimal lebar/tinggi 800px)
-        const canvas = document.createElement("canvas");
-        let width = img.width;
-        let height = img.height;
-        const max_size = 800;
-        
-        if (width > height) {
-          if (width > max_size) {
-            height *= max_size / width;
-            width = max_size;
-          }
-        } else {
-          if (height > max_size) {
-            width *= max_size / height;
-            height = max_size;
-          }
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Kompres gambar menjadi format JPEG dengan kualitas 70% agar file sangat kecil
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(f);
-  });
-}
-
-/* POSTING BARU */
-async function uploadPost(){
-  if (!user) return;
-  showNotification("Sedang memproses & mengirim kiriman...");
-  
-  const mediaUrl = await getFileBase64(document.getElementById("file"));
-  const captionVal = document.getElementById("caption").value;
-
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("posts").add({
-    user: user,
-    media: mediaUrl,
-    caption: captionVal || "Momen spesial kita 💕",
-    time: Date.now(),
-    likes: 0
-  }).then(() => {
-    showNotification("Postingan berhasil diunggah!");
-    document.getElementById("caption").value = "";
-    document.getElementById("file").value = "";
-    show("feed");
-  }).catch(err => {
-    showNotification("Gagal kirim postingan: " + err.message);
-  });
-}
-
-/* CERITA BARU (24 JAM) */
-async function uploadStory(){
-  if (!user) return;
-  showNotification("Sedang memproses & mengirim cerita...");
-
-  const mediaUrl = await getFileBase64(document.getElementById("file"));
-
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("stories").add({
-    user: user,
-    media: mediaUrl,
-    time: Date.now()
-  }).then(() => {
-    showNotification("Cerita baru dibagikan!");
-    document.getElementById("file").value = "";
-    show("feed");
-  }).catch(err => {
-    showNotification("Gagal membagikan cerita: " + err.message);
-  });
-}
-
-/* MENYUKAI POSTINGAN (LIKE TRANSACTION) */
-function likePost(postId) {
-  if (!user) return;
-  const postRef = db.collection("artifacts").doc(appId).collection("public").doc("data").collection("posts").doc(postId);
-  
-  // Menggunakan transaksi database agar perhitungan jumlah menyukai akurat secara bersamaan
-  db.runTransaction(transaction => {
-    return transaction.get(postRef).then(docSnap => {
-      if (!docSnap.exists) return;
-      const currentLikes = docSnap.data().likes || 0;
-      transaction.update(postRef, { likes: currentLikes + 1 });
-    });
-  }).then(() => {
-    showNotification("Disukai! ❤️");
-  }).catch(err => {
-    console.error("Gagal menyukai postingan:", err);
-  });
-}
-
-/* MUAT SEMUA POSTINGAN (Rule 2: Urutkan lokal) */
-function loadPosts(){
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("posts")
-  .onSnapshot(snap => {
-    const feed = document.getElementById("feed");
-    feed.innerHTML = "";
-    
-    let list = [];
-    snap.forEach(doc => {
-      list.push({ id: doc.id, ...doc.data() });
-    });
-
-    // Urutkan secara lokal (terbaru ke terlama)
-    list.sort((a, b) => b.time - a.time);
-
-    if (list.length === 0) {
-      feed.innerHTML = "<div style='text-align:center; padding:40px; color:#555;'>Belum ada foto yang diposting.</div>";
-      return;
-    }
-
-    list.forEach(d => {
-      feed.innerHTML += `
-      <div class="post">
-        <b style="color:#ff2d75;">${d.user}</b><br>
-        <span style="font-size:9px; color:#555;">${new Date(d.time).toLocaleString('id-ID')}</span>
-        <img src="${d.media}" style="margin-top:10px; max-height: 400px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=500'">
-        <p style="margin:8px 0 0 0; font-size:14px; line-height:1.4;">${d.caption}</p>
-        <div style="margin-top: 10px; display: flex; align-items: center;">
-          <button onclick="likePost('${d.id}')" style="width: auto; padding: 5px 12px; margin: 0; font-size: 11px; border-radius: 6px;">❤️ ${d.likes || 0} Likes</button>
+                <button onclick="switchTab('ai')" id="nav-ai" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="bot" class="w-4.5 h-4.5"></i>
+                        <span class="ml-2 md:ml-0">PlastiGo AI</span>
+                    </div>
+                    <span class="bg-gradient-to-r from-cyan-400 to-indigo-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse ml-2">
+                        <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> AI
+                    </span>
+                </button>
+            </nav>
         </div>
-      </div>`;
-    });
-  }, error => {
-    console.error("Gagal mendengarkan postingan:", error);
-  });
-}
 
-/* MUAT CERITA (AUTO 24 JAM FILTER LOKAL) */
-function loadStories(){
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("stories")
-  .onSnapshot(snap => {
-    const stories = document.getElementById("stories");
-    stories.innerHTML = "";
-    let now = Date.now();
-    let count = 0;
+        <!-- User Info / Footer (Hidden on mobile) -->
+        <div class="hidden md:block p-4 border-t border-slate-800 bg-slate-900/50">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-emerald-400 font-bold border border-slate-700">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400">Kasir Bertugas</p>
+                    <p class="text-sm font-semibold text-white">Owner Toko Jaya</p>
+                </div>
+            </div>
+        </div>
+    </aside>
 
-    snap.forEach(doc => {
-      let d = doc.data();
-      if(now - d.time < 86400000){ // 24 jam saja
-        count++;
-        stories.innerHTML += `
-        <div class="storyBox" style="flex-shrink:0; width:80px; text-align:center; margin:5px; padding:5px;">
-          <b style="font-size:10px; display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-bottom:4px;">${d.user.split('@')[0]}</b>
-          <img src="${d.media}" style="width:60px; height:60px; object-fit: cover; border-radius:50%; border: 2px solid #ff2d75;" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=100'">
-        </div>`;
-      }
-    });
+    <!-- MAIN CONTENT WORKSPACE -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        
+        <!-- TOP BAR -->
+        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900 shrink-0">
+            <h2 id="page-title" class="text-lg font-bold text-white capitalize">Terminal Kasir</h2>
+            
+            <div class="flex items-center space-x-4">
+                <div id="low-stock-alert-banner" class="hidden flex items-center space-x-2 bg-amber-500/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/20 text-xs">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 animate-bounce"></i>
+                    <span>Ada barang yang hampir habis!</span>
+                    <button onclick="switchTab('inventory')" class="underline hover:text-amber-300 font-semibold ml-1">Cek Stok</button>
+                </div>
+                <div class="text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hidden sm:block">
+                    Hari ini: <span id="current-date-display" class="font-semibold text-white">-</span>
+                </div>
+            </div>
+        </header>
 
-    if (count === 0) {
-      stories.innerHTML = "<div style='color:#444; font-size:11px; padding:10px;'>Belum ada cerita baru hari ini...</div>";
-    }
-  }, error => {
-    console.error("Gagal memuat cerita:", error);
-  });
-}
+        <!-- WORKSPACE PANELS -->
+        <div class="flex-1 overflow-hidden relative">
+            
+            <!-- Toast Feedback -->
+            <div id="toast-container" class="absolute top-4 right-4 z-50 pointer-events-none space-y-2"></div>
 
-/* OBROLAN / CHAT */
-function sendMsg(){
-  const msgInput = document.getElementById("msg");
-  const msgVal = msgInput.value.trim();
-  if(!msgVal || !user) return;
+            <!-- TAB 1: DASHBOARD ANALYTICS -->
+            <div id="tab-dashboard" class="tab-content hidden p-6 h-full overflow-y-auto space-y-6">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Omzet</p>
+                            <h3 id="stat-total-sales" class="text-2xl font-black mt-2 text-white">Rp 0</h3>
+                            <p class="text-xs text-emerald-400 mt-1 flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Stabil</p>
+                        </div>
+                        <div class="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl">
+                            <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                        </div>
+                    </div>
 
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("chats").add({
-    user: user,
-    msg: msgVal,
-    time: Date.now()
-  }).then(() => {
-    msgInput.value = "";
-    // Matikan indikator mengetik saat mengirim pesan
-    const cleanKey = user.replace(/[^a-zA-Z0-9]/g, "_");
-    db.collection("artifacts").doc(appId).collection("public").doc("data").collection("typing").doc(cleanKey).set({
-      typing: false
-    });
-  });
-}
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Nota Selesai</p>
+                            <h3 id="stat-trx-count" class="text-2xl font-black mt-2 text-white">0 Transaksi</h3>
+                            <p class="text-xs text-slate-400 mt-1 font-medium">Pembayaran sukses</p>
+                        </div>
+                        <div class="bg-cyan-500/10 text-cyan-400 p-4 rounded-xl">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                        </div>
+                    </div>
 
-function loadChat(){
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("chats")
-  .onSnapshot(snap => {
-    const chatBox = document.getElementById("chatBox");
-    chatBox.innerHTML = "";
-    
-    let list = [];
-    snap.forEach(doc => {
-      list.push(doc.data());
-    });
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Stok Kritis (&le; 10)</p>
+                            <h3 id="stat-low-stock" class="text-2xl font-black mt-2 text-rose-400">0 Item</h3>
+                            <p class="text-xs text-rose-400/80 mt-1">Perlu segera di-restock</p>
+                        </div>
+                        <div class="bg-rose-500/10 text-rose-400 p-4 rounded-xl">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                        </div>
+                    </div>
 
-    // Urutkan secara lokal berdasarkan waktu (Rule 2)
-    list.sort((a, b) => a.time - b.time);
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Produk Terlaris</p>
+                            <h3 id="stat-top-product" class="text-sm font-bold mt-2 text-emerald-300 leading-tight truncate max-w-[180px]">-</h3>
+                            <p class="text-xs text-slate-400 mt-1">Kuantitas tertinggi</p>
+                        </div>
+                        <div class="bg-amber-500/10 text-amber-400 p-4 rounded-xl">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
 
-    list.forEach(d => {
-      const isMe = d.user === user;
-      chatBox.innerHTML += `
-      <div class="msg ${isMe ? 'me' : 'you'}">
-        <span style="font-size:9px; opacity:0.7; display:block; margin-bottom:2px;">${isMe ? 'Saya' : d.user}</span>
-        ${d.msg}
-      </div>`;
-    });
+                <!-- Quick Actions & Tips -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- AI Tip -->
+                    <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-slate-800 p-6 rounded-2xl">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="bg-indigo-500/20 text-indigo-400 p-2 rounded-lg">
+                                <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
+                            </div>
+                            <h4 class="font-bold text-white">Rekomendasi Strategi Toko</h4>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                          "Plastik jenis PP bening dan mika makanan CX-3A selalu mengalami peningkatan permintaan menjelang akhir pekan karena maraknya pemesanan katering pernikahan dan kue basah. Pastikan pajangan etalase dan persediaan grosir selalu terisi penuh."
+                        </p>
+                        <button onclick="switchTab('ai')" class="mt-4 flex items-center gap-1.5 text-xs text-indigo-400 font-bold hover:text-indigo-300 transition">
+                            Konsultasikan Strategi Kemasan Lainnya <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
 
-    // Geser scroll paling bawah otomatis
-    chatBox.scrollTop = chatBox.scrollHeight;
-  }, error => {
-    console.error("Gagal mendengarkan obrolan:", error);
-  });
-}
+                    <!-- Shortcuts -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+                        <h4 class="font-bold text-white mb-4">Aksi Cepat Menu</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="switchTab('pos')" class="bg-emerald-500 text-slate-950 font-bold p-3 rounded-xl hover:bg-emerald-400 transition text-sm text-center flex flex-col items-center gap-2">
+                                <i data-lucide="shopping-cart" class="w-5 h-5"></i> Kasir POS Baru
+                            </button>
+                            <button onclick="openProductModal()" class="bg-slate-800 text-white font-bold p-3 rounded-xl hover:bg-slate-700 transition text-sm text-center flex flex-col items-center gap-2 border border-slate-700">
+                                <i data-lucide="plus" class="w-5 h-5"></i> Tambah Produk Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-/* TYPING INDICATOR */
-let typingTimeout;
-function typing(){
-  if (!user) return;
-  const cleanKey = user.replace(/[^a-zA-Z0-9]/g, "_");
-  
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("typing").doc(cleanKey).set({
-    typing: true,
-    user: user,
-    time: Date.now()
-  });
+            <!-- TAB 2: TERMINAL KASIR (POS) -->
+            <div id="tab-pos" class="tab-content flex flex-col lg:flex-row h-full overflow-hidden">
+                <!-- Product Grid Panel -->
+                <div class="flex-1 flex flex-col h-full bg-slate-950 border-r border-slate-800 overflow-hidden">
+                    <!-- Search & Filter -->
+                    <div class="p-4 bg-slate-900 border-b border-slate-800 flex flex-col gap-3 shrink-0">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-3.5 text-slate-400 w-4.5 h-4.5"></i>
+                            <input 
+                              type="text" 
+                              id="pos-search"
+                              placeholder="Cari nama plastik atau ukuran (misal: HDPE, 24x40, PP)..." 
+                              class="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-400"
+                              oninput="renderPOSProducts()"
+                            />
+                        </div>
 
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    db.collection("artifacts").doc(appId).collection("public").doc("data").collection("typing").doc(cleanKey).set({
-      typing: false
-    });
-  }, 1500);
-}
+                        <!-- Category filters -->
+                        <div id="pos-categories" class="flex space-x-2 overflow-x-auto pb-1">
+                            <!-- Dynamic Categories -->
+                        </div>
+                    </div>
 
-/* MENAMPILKAN INDIKATOR SEDANG MENGETIK */
-function listenToTyping() {
-  db.collection("artifacts").doc(appId).collection("public").doc("data").collection("typing")
-  .onSnapshot(snap => {
-    const typingDiv = document.getElementById("typing");
-    let typers = [];
+                    <!-- Products Grid -->
+                    <div class="flex-1 overflow-y-auto p-4">
+                        <div id="pos-products-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                            <!-- Dynamic Products -->
+                        </div>
+                    </div>
+                </div>
 
-    snap.forEach(doc => {
-      let d = doc.data();
-      if(doc.id !== user.replace(/[^a-zA-Z0-9]/g, "_") && d.typing){
-        typers.push(d.user);
-      }
-    });
+                <!-- Shopping Cart Sidebar -->
+                <div class="w-full lg:w-96 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-full justify-between shrink-0 overflow-hidden">
+                    <!-- Cart Header -->
+                    <div class="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="shopping-bag" class="text-emerald-400 w-5 h-5"></i>
+                            <h3 class="font-bold text-white">Keranjang Kasir</h3>
+                        </div>
+                        <span id="cart-count-badge" class="bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded-full font-bold">0 Item</span>
+                    </div>
 
-    if (typers.length > 0) {
-      typingDiv.innerText = typers[0] + " sedang mengetik...";
-    } else {
-      typingDiv.innerText = "";
-    }
-  });
-}
+                    <!-- Customer Type Config -->
+                    <div class="p-4 bg-slate-950/40 border-b border-slate-800 space-y-3 shrink-0">
+                        <div class="flex items-center justify-between">
+                          <label class="text-xs text-slate-400 font-semibold uppercase">Tipe Pelanggan</label>
+                          <div class="flex space-x-1">
+                            <button id="cust-umum-btn" onclick="setCustomerType('Umum')" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950">Umum</button>
+                            <button id="cust-reseller-btn" onclick="setCustomerType('Reseller')" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">Reseller</button>
+                          </div>
+                        </div>
+                        <div id="reseller-info-banner" class="hidden text-[11px] text-emerald-400 bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
+                          Mode Reseller Aktif: Otomatis mendapat harga grosir per pack tanpa jumlah minimum!
+                        </div>
+                    </div>
 
-// Inisialisasi awal saat halaman dibuka
-window.onload = async () => {
-  await initAuth();
-};
+                    <!-- Cart Item List -->
+                    <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+                        <!-- Dynamic Cart Items -->
+                    </div>
 
-/* AUTO OFF PASANGAN KETIKA TAB DIKELUARKAN */
-window.onbeforeunload = () => {
-  if (user) {
-    setOnline(false);
-  }
-};
-</script>
+                    <!-- Checkout Summary -->
+                    <div class="p-4 border-t border-slate-800 bg-slate-950/40 space-y-4 shrink-0">
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between text-slate-400">
+                                <span>Subtotal:</span>
+                                <span id="cart-subtotal" class="font-semibold text-white font-mono">Rp 0</span>
+                            </div>
 
+                            <div class="flex justify-between items-center text-slate-400">
+                                <span>Diskon Tambahan (%):</span>
+                                <input 
+                                  type="number" 
+                                  id="cart-discount-input"
+                                  min="0" 
+                                  max="100" 
+                                  value="0"
+                                  class="w-14 bg-slate-800 border border-slate-750 text-center rounded py-0.5 text-xs text-white font-bold" 
+                                  oninput="calculateCart()"
+                                />
+                            </div>
+
+                            <div class="flex justify-between text-slate-400">
+                                <span>PPN (11%):</span>
+                                <span id="cart-tax" class="font-semibold text-white font-mono">Rp 0</span>
+                            </div>
+
+                            <div class="flex justify-between text-sm border-t border-slate-800 pt-2 text-white">
+                                <span class="font-bold">Total Pembayaran:</span>
+                                <span id="cart-grandtotal" class="font-extrabold text-emerald-400 font-mono text-base">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="space-y-2">
+                            <label class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Metode Pembayaran</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="pay-cash-btn" onclick="setPaymentMethod('Tunai')" class="py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-emerald-500 text-slate-950">
+                                    <i data-lucide="banknote" class="w-4 h-4"></i>
+                                    <span>Tunai</span>
+                                </button>
+                                <button id="pay-qris-btn" onclick="setPaymentMethod('QRIS/Transfer')" class="py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-slate-850 border border-slate-700 text-slate-300 hover:bg-slate-800">
+                                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                                    <span>QRIS / Bank</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cash received input -->
+                        <div id="cash-input-section" class="space-y-1">
+                            <label class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Uang Tunai Diterima</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-slate-400 text-xs font-bold">Rp</span>
+                                <input
+                                  type="number"
+                                  id="cash-received-amount"
+                                  placeholder="0"
+                                  class="w-full bg-slate-850 border border-slate-700 rounded-xl py-2.5 pl-8 pr-4 text-sm text-white font-bold font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                  oninput="calculateCart()"
+                                />
+                            </div>
+                            <div id="cash-change-container" class="hidden flex justify-between text-xs text-emerald-400 font-bold bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
+                                <span>Kembalian:</span>
+                                <span id="cash-change" class="font-mono">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button
+                          id="btn-checkout"
+                          onclick="processCheckout()"
+                          class="w-full py-3.5 rounded-xl font-bold transition flex items-center justify-center space-x-2 text-sm bg-slate-850 text-slate-600 cursor-not-allowed shadow-none"
+                          disabled
+                        >
+                          <span>Selesaikan Transaksi & Cetak</span>
+                          <i data-lucide="printer" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ATUR STOK BARANG (INVENTORY) -->
+            <div id="tab-inventory" class="tab-content hidden p-6 h-full flex flex-col overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Database Stok Produk Plastik</h3>
+                        <p class="text-xs text-slate-400 mt-1">Kelola stok gudang, kategori, harga eceran dan harga grosir.</p>
+                    </div>
+                    <button
+                      onclick="openProductModal()"
+                      class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm transition-all shadow-lg shadow-emerald-500/10"
+                    >
+                      <i data-lucide="plus" class="w-4 h-4"></i>
+                      <span>Tambah Produk Baru</span>
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="flex-1 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-xs md:text-sm">
+                            <thead class="bg-slate-800 text-slate-300 uppercase tracking-wider text-[11px] border-b border-slate-700 sticky top-0">
+                                <tr>
+                                    <th class="py-4 px-6 font-bold">Kategori / Nama Produk</th>
+                                    <th class="py-4 px-6 font-bold">Ukuran & Satuan</th>
+                                    <th class="py-4 px-6 font-bold text-right">Stok Gudang</th>
+                                    <th class="py-4 px-6 font-bold text-right">Harga Eceran</th>
+                                    <th class="py-4 px-6 font-bold text-right">Harga Grosir</th>
+                                    <th class="py-4 px-6 font-bold text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-800">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: RIWAYAT TRANSAKSI -->
+            <div id="tab-history" class="tab-content hidden p-6 h-full flex flex-col overflow-hidden">
+                <div class="mb-6 shrink-0">
+                    <h3 class="text-xl font-bold text-white">Laporan & Riwayat Penjualan</h3>
+                    <p class="text-xs text-slate-400 mt-1">Rekap semua nota penjualan kasir yang berhasil diproses.</p>
+                </div>
+
+                <div class="flex-1 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+                    <div class="overflow-y-auto flex-1">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-800 text-slate-300 uppercase tracking-wider text-[11px] border-b border-slate-700 sticky top-0">
+                                <tr>
+                                    <th class="py-4 px-6 font-bold">No Nota / Tanggal</th>
+                                    <th class="py-4 px-6 font-bold">Pelanggan</th>
+                                    <th class="py-4 px-6 font-bold">Detail Barang Belanjaan</th>
+                                    <th class="py-4 px-6 font-bold text-center">Metode</th>
+                                    <th class="py-4 px-6 font-bold text-right">Total Nota</th>
+                                    <th class="py-4 px-6 font-bold text-center font-bold">Cetak</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-slate-800">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: AI PLASTIGO CONSULTANT -->
+            <div id="tab-ai" class="tab-content hidden p-6 h-full flex flex-col overflow-hidden">
+                <div class="bg-gradient-to-r from-slate-900 to-indigo-950 p-4 rounded-t-2xl border border-slate-800 flex justify-between items-center shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-gradient-to-tr from-cyan-400 to-indigo-500 text-slate-950 p-2.5 rounded-xl font-black">
+                            <i data-lucide="bot" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-base flex items-center gap-1.5">
+                                PlastiGo AI Consultant
+                                <span class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-[10px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">Online</span>
+                            </h3>
+                            <p class="text-xs text-slate-400">Rekomendasi jenis bahan plastik terbaik untuk berbagai kebutuhan usaha</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat history -->
+                <div id="ai-chat-viewport" class="flex-1 bg-slate-950 border-x border-b border-slate-800 p-4 overflow-y-auto space-y-4">
+                    <!-- Dynamic chats -->
+                    <div class="flex justify-start">
+                        <div class="max-w-[75%] rounded-2xl p-4 text-sm leading-relaxed bg-slate-900 border border-slate-800 text-slate-100 rounded-tl-none shadow-lg">
+                            <div class="flex items-center space-x-1.5 mb-1.5">
+                                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+                                <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">PlastiGo Intelligence</span>
+                            </div>
+                            <p class="text-[13px] md:text-sm">Halo! Saya Asisten AI Toko Plastik Anda. Ada yang bisa saya bantu? Misalnya tanyakan: "Jenis plastik apa yang cocok untuk makanan kuah bakso panas?" atau "Rekomendasikan paket kemasan untuk UMKM keripik pisang."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat quick suggestion badges -->
+                <div class="p-3 bg-slate-900 border-x border-slate-800 flex flex-wrap gap-2 shrink-0">
+                    <span class="text-[11px] font-bold text-slate-500 self-center uppercase mr-1">Tanya AI:</span>
+                    <button onclick="sendQuickPrompt('Plastik tahan panas untuk bakso berkuah?')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-full transition">"Plastik tahan panas bakso?"</button>
+                    <button onclick="sendQuickPrompt('Kemasan plastik premium keripik pisang UMKM')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-full transition">"Kemasan keripik pisang?"</button>
+                    <button onclick="sendQuickPrompt('Bedanya HDPE dengan PP untuk bungkus makanan')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-full transition">"Beda HDPE vs PP?"</button>
+                </div>
+
+                <!-- Send prompt area -->
+                <form id="ai-chat-form" onsubmit="handleSendAiMessage(event)" class="bg-slate-900 p-4 rounded-b-2xl border-x border-b border-slate-800 flex space-x-2 shrink-0">
+                    <input
+                      type="text"
+                      id="ai-user-input"
+                      placeholder="Ketik pertanyaan seputar solusi kemasan plastik Anda di sini..."
+                      class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <button
+                      type="submit"
+                      class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all flex items-center space-x-1.5"
+                    >
+                      <span>Kirim</span>
+                      <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- --- MODALS --- -->
+
+    <!-- MODAL: ADD / EDIT PRODUCT -->
+    <div id="product-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                <h3 id="product-modal-title" class="text-lg font-bold text-white">Tambah Produk Plastik Baru</h3>
+                <button onclick="closeProductModal()" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="saveProduct(event)" class="p-6 space-y-4">
+                <input type="hidden" id="form-product-id">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2 space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Nama Produk</label>
+                        <input
+                          type="text"
+                          id="form-product-name"
+                          required
+                          placeholder="Contoh: Plastik Kresek HDPE Super Tebal"
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Kategori</label>
+                        <select
+                          id="form-product-category"
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        >
+                            <option value="Kresek">Kresek</option>
+                            <option value="Plastik PP">Plastik PP</option>
+                            <option value="Plastik PE">Plastik PE</option>
+                            <option value="Plastik OPP">Plastik OPP</option>
+                            <option value="Mika/Dus">Mika/Dus</option>
+                            <option value="Standing Pouch">Standing Pouch</option>
+                            <option value="Aksesoris">Aksesoris</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Ukuran / Spesifikasi</label>
+                        <input
+                          type="text"
+                          id="form-product-size"
+                          placeholder="Contoh: 15x30 cm / Tebal 0.5"
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Stok Gudang</label>
+                        <input
+                          type="number"
+                          id="form-product-stock"
+                          min="0"
+                          required
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Satuan Penjualan</label>
+                        <input
+                          type="text"
+                          id="form-product-unit"
+                          required
+                          placeholder="Pack / Pcs / Meter / Roll"
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Harga Eceran (Rp)</label>
+                        <input
+                          type="number"
+                          id="form-product-price"
+                          min="0"
+                          required
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                        />
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Harga Grosir (Rp)</label>
+                        <input
+                          type="number"
+                          id="form-product-wholesale"
+                          min="0"
+                          required
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                        />
+                    </div>
+
+                    <div class="space-y-1 col-span-2">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Minimal Pengambilan Grosir (Qty)</label>
+                        <input
+                          type="number"
+                          id="form-product-min-wholesale"
+                          min="1"
+                          required
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                        />
+                    </div>
+
+                    <div class="col-span-2 space-y-1">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Keterangan Produk</label>
+                        <textarea
+                          id="form-product-desc"
+                          rows="2"
+                          placeholder="Fungsi utama, kelebihan, daya tahan..."
+                          class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800 flex justify-end space-x-2">
+                    <button
+                      type="button"
+                      onclick="closeProductModal()"
+                      class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-semibold transition"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-lg shadow-emerald-500/10"
+                    >
+                      Simpan Produk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RECEIPT STRUK PENJUALAN -->
+    <div id="receipt-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+        <div class="bg-white text-slate-900 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 relative">
+            <button onclick="closeReceiptModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition no-print">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Printed content -->
+            <div id="receipt-modal-content">
+                <!-- Dynamic Struk -->
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="mt-6 flex gap-2 no-print">
+                <button
+                  onclick="window.print()"
+                  class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
+                >
+                  <i data-lucide="printer" class="w-4 h-4"></i>
+                  <span>Cetak Nota</span>
+                </button>
+                <button
+                  onclick="closeReceiptModal()"
+                  class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-xl text-xs transition"
+                >
+                  Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // === STATE MANAGEMENT ===
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-plastigo-app';
+        const apiKey = ""; // Gemini API runtime key
+
+        const INITIAL_PRODUCTS = [
+          { id: 'p1', name: 'Plastik Kresek HDPE Putih (24x40)', category: 'Kresek', stock: 120, price: 15000, wholesalePrice: 13500, minWholesale: 10, unit: 'Pack', size: '24x40 cm', description: 'Kuat, tidak mudah sobek, cocok untuk belanjaan umum.' },
+          { id: 'p2', name: 'Plastik PP Bening Tebal 0.5 (15x30)', category: 'Plastik PP', stock: 85, price: 18000, wholesalePrice: 16500, minWholesale: 5, unit: 'Pack', size: '15x30 cm', description: 'Sangat jernih, kaku, cocok untuk keripik atau snack kering.' },
+          { id: 'p3', name: 'Plastik PE Cor (Lebar 100cm)', category: 'Plastik PE', stock: 8, price: 25000, wholesalePrice: 23000, minWholesale: 5, unit: 'Meter', size: 'Lebar 100cm', description: 'Elastis, tebal, biasa digunakan untuk cor bangunan atau membungkus kasur.' },
+          { id: 'p4', name: 'Mika Makanan Transparan CX-3A', category: 'Mika/Dus', stock: 250, price: 45000, wholesalePrice: 41000, minWholesale: 5, unit: 'Dus (100pcs)', size: 'Standard CX-3A', description: 'Wadah mika untuk kue basah, nasi uduk, aman untuk makanan hangat.' },
+          { id: 'p5', name: 'Sedotan Steril Ulir Hitam (Isi 500)', category: 'Aksesoris', stock: 4, price: 22000, wholesalePrice: 20000, minWholesale: 12, unit: 'Pack', size: '20 cm', description: 'Sedotan higienis dengan bungkus kertas per pcs.' },
+          { id: 'p6', name: 'Plastik OPP Lem Segel Bening (10x15)', category: 'Plastik OPP', stock: 90, price: 12000, wholesalePrice: 10500, minWholesale: 10, unit: 'Pack', size: '10x15 cm', description: 'Dilengkapi lem perekat, sangat bening, biasanya untuk packing pakaian atau hijab.' },
+          { id: 'p7', name: 'Standing Pouch Sablon Putih 150gr', category: 'Standing Pouch', stock: 15, price: 1250, wholesalePrice: 1100, minWholesale: 100, unit: 'Pcs', size: '14x22 cm', description: 'Kemasan berdiri dengan zipper lock berkualitas tinggi.' }
+        ];
+
+        const CATEGORIES = ['Semua', 'Kresek', 'Plastik PP', 'Plastik PE', 'Plastik OPP', 'Mika/Dus', 'Standing Pouch', 'Aksesoris'];
+
+        let products = JSON.parse(localStorage.getItem('plastigo_products')) || INITIAL_PRODUCTS;
+        let transactions = JSON.parse(localStorage.getItem('plastigo_transactions')) || [];
+        let cart = [];
+        let activeTab = 'pos';
+        let customerType = 'Umum'; // Umum / Reseller
+        let paymentMethod = 'Tunai'; // Tunai / QRIS/Transfer
+        let selectedCategory = 'Semua';
+
+        // === INITIALIZATION ===
+        window.onload = function() {
+            lucide.createIcons();
+            document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            initPOSCategories();
+            switchTab('pos'); // Default active tab is POS terminal
+            updateAppMetrics();
+        }
+
+        // === NOTIFICATION SYSTEM ===
+        function triggerToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colorClasses = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+            let iconName = 'check-circle';
+            if (type === 'error') {
+                colorClasses = 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+                iconName = 'alert-octagon';
+            } else if (type === 'info') {
+                colorClasses = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+                iconName = 'info';
+            }
+
+            toast.className = `flex items-center space-x-2 px-4 py-3 rounded-xl shadow-2xl border transition-all duration-300 transform translate-y-2 opacity-0 ${colorClasses}`;
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="w-4.5 h-4.5"></i>
+                <span class="text-sm font-semibold">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Out & Remove
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // === TAB NAVIGATION ===
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Remove active style from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all text-slate-300 hover:bg-slate-800 hover:text-white whitespace-nowrap";
+            });
+
+            // Show active content
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            // Set active styles
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 whitespace-nowrap";
+            }
+
+            // Update header title
+            const titles = {
+                dashboard: 'Dashboard Analisa Toko',
+                pos: 'Terminal Kasir',
+                inventory: 'Manajemen Stok Gudang',
+                history: 'Laporan Riwayat Transaksi',
+                ai: 'Asisten Cerdas Solusi Kemasan'
+            };
+            document.getElementById('page-title').innerText = titles[tabName] || 'Aplikasi Kasir';
+
+            // Special Tab Render triggers
+            if (tabName === 'pos') {
+                renderPOSProducts();
+            } else if (tabName === 'inventory') {
+                renderInventoryTable();
+            } else if (tabName === 'history') {
+                renderHistoryTable();
+            } else if (tabName === 'dashboard') {
+                updateDashboardStats();
+            }
+        }
+
+        // === APP METRICS UPDATE ===
+        function updateAppMetrics() {
+            const lowStockCount = products.filter(p => p.stock <= 10).length;
+            const badgeNav = document.getElementById('low-stock-badge-nav');
+            const alertBanner = document.getElementById('low-stock-alert-banner');
+
+            if (lowStockCount > 0) {
+                badgeNav.innerText = lowStockCount;
+                badgeNav.classList.remove('hidden');
+                alertBanner.classList.remove('hidden');
+            } else {
+                badgeNav.classList.add('hidden');
+                alertBanner.classList.add('hidden');
+            }
+
+            localStorage.setItem('plastigo_products', JSON.stringify(products));
+            localStorage.setItem('plastigo_transactions', JSON.stringify(transactions));
+        }
+
+        // === TAB 1: DASHBOARD ANALYTICS ===
+        function updateDashboardStats() {
+            const totalSales = transactions.reduce((sum, t) => sum + t.grandTotal, 0);
+            const transCount = transactions.length;
+            const lowStockCount = products.filter(p => p.stock <= 10).length;
+
+            // Calculating top selling product
+            const itemSalesMap = {};
+            transactions.forEach(t => {
+                t.items.forEach(item => {
+                    itemSalesMap[item.name] = (itemSalesMap[item.name] || 0) + item.quantity;
+                });
+            });
+
+            let topProductName = "-";
+            let maxQty = 0;
+            Object.entries(itemSalesMap).forEach(([name, qty]) => {
+                if (qty > maxQty) {
+                    maxQty = qty;
+                    topProductName = name;
+                }
+            });
+
+            document.getElementById('stat-total-sales').innerText = `Rp ${totalSales.toLocaleString('id-ID')}`;
+            document.getElementById('stat-trx-count').innerText = `${transCount} Transaksi`;
+            document.getElementById('stat-low-stock').innerText = `${lowStockCount} Item`;
+            document.getElementById('stat-top-product').innerText = topProductName !== "-" ? `${topProductName} (${maxQty} Terjual)` : "-";
+        }
+
+        // === TAB 2: TERMINAL KASIR (POS) LOGIC ===
+        function initPOSCategories() {
+            const container = document.getElementById('pos-categories');
+            container.innerHTML = CATEGORIES.map(cat => `
+                <button
+                  id="cat-btn-${cat.replace(/\s+/g, '')}"
+                  onclick="setPOSCategory('${cat}')"
+                  class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}"
+                >
+                  ${cat}
+                </button>
+            `).join('');
+        }
+
+        function setPOSCategory(category) {
+            selectedCategory = category;
+            initPOSCategories();
+            renderPOSProducts();
+        }
+
+        function renderPOSProducts() {
+            const grid = document.getElementById('pos-products-grid');
+            const search = document.getElementById('pos-search').value.toLowerCase();
+
+            const filtered = products.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(search) || p.size.toLowerCase().includes(search);
+                const matchesCategory = selectedCategory === 'Semua' || p.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-slate-400">Tidak ada produk plastik yang cocok dengan filter pencarian.</p>
+                        <button onclick="resetPOSFilter()" class="mt-2 text-xs text-emerald-400 hover:underline">Reset Filter</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(prod => {
+                const stockStyle = prod.stock <= 10 ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                const isOutOfStock = prod.stock <= 0;
+                
+                return `
+                    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col justify-between hover:border-slate-700 hover:shadow-xl transition relative group overflow-hidden">
+                        <!-- Stock Status -->
+                        <div class="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full border ${stockStyle}">
+                            Stok: ${prod.stock} ${prod.unit}
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="text-[10px] uppercase tracking-wider font-extrabold text-emerald-400">${prod.category}</span>
+                            <h4 class="font-bold text-white text-sm mt-1 leading-snug group-hover:text-emerald-300 transition-colors">${prod.name}</h4>
+                            <p class="text-xs text-slate-400 mt-1 font-mono">Ukuran: ${prod.size || '-'}</p>
+                            <p class="text-xs text-slate-400 mt-2 line-clamp-2 italic">${prod.description}</p>
+                        </div>
+
+                        <div class="border-t border-slate-800/80 pt-3 flex items-center justify-between mt-auto">
+                            <div>
+                                <p class="text-xs text-slate-400">Ecer: <span class="font-bold text-white">Rp ${prod.price.toLocaleString('id-ID')}</span></p>
+                                <p class="text-[11px] text-emerald-400">Grosir: Rp ${prod.wholesalePrice.toLocaleString('id-ID')} <span class="text-slate-500">(&ge;${prod.minWholesale})</span></p>
+                            </div>
+                            <button
+                              onclick="addToCart('${prod.id}')"
+                              ${isOutOfStock ? 'disabled' : ''}
+                              class="p-2.5 rounded-xl transition-all ${isOutOfStock ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-md hover:scale-105 active:scale-95'}"
+                            >
+                                <i data-lucide="plus" class="w-4.5 h-4.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function resetPOSFilter() {
+            document.getElementById('pos-search').value = '';
+            setPOSCategory('Semua');
+        }
+
+        // --- CART LOGIC ---
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            if (product.stock <= 0) {
+                triggerToast(`Stok ${product.name} habis!`, 'error');
+                return;
+            }
+
+            const existingCartItem = cart.find(item => item.id === productId);
+            if (existingCartItem) {
+                if (existingCartItem.quantity >= product.stock) {
+                    triggerToast(`Tidak dapat melebih stok yang tersedia (${product.stock} ${product.unit})`, 'error');
+                    return;
+                }
+                existingCartItem.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            triggerToast(`Ditambahkan ke keranjang: ${product.name}`);
+            calculateCart();
+        }
+
+        function updateCartQty(productId, change) {
+            const item = cart.find(i => i.id === productId);
+            const product = products.find(p => p.id === productId);
+            if (!item || !product) return;
+
+            const newQty = item.quantity + change;
+            if (newQty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            } else if (newQty > product.stock) {
+                triggerToast(`Stok tidak mencukupi. Maksimum stok ${product.stock} ${product.unit}`, 'error');
+                return;
+            } else {
+                item.quantity = newQty;
+            }
+            calculateCart();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            triggerToast("Barang dihapus dari keranjang", "info");
+            calculateCart();
+        }
+
+        function setCustomerType(type) {
+            customerType = type;
+            const umumBtn = document.getElementById('cust-umum-btn');
+            const resellerBtn = document.getElementById('cust-reseller-btn');
+            const infoBanner = document.getElementById('reseller-info-banner');
+
+            if (type === 'Reseller') {
+                resellerBtn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950";
+                umumBtn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+                infoBanner.classList.remove('hidden');
+            } else {
+                umumBtn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500 text-slate-950";
+                resellerBtn.className = "px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+                infoBanner.classList.add('hidden');
+            }
+            calculateCart();
+        }
+
+        function setPaymentMethod(method) {
+            paymentMethod = method;
+            const cashBtn = document.getElementById('pay-cash-btn');
+            const qrisBtn = document.getElementById('pay-qris-btn');
+            const cashSection = document.getElementById('cash-input-section');
+
+            if (method === 'Tunai') {
+                cashBtn.className = "py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-emerald-500 text-slate-950";
+                qrisBtn.className = "py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-slate-850 border border-slate-700 text-slate-300 hover:bg-slate-800";
+                cashSection.classList.remove('hidden');
+            } else {
+                qrisBtn.className = "py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-emerald-500 text-slate-950";
+                cashBtn.className = "py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-slate-850 border border-slate-700 text-slate-300 hover:bg-slate-800";
+                cashSection.classList.add('hidden');
+            }
+            calculateCart();
+        }
+
+        let currentTotals = { subtotal: 0, discount: 0, tax: 0, grandTotal: 0 };
+
+        function calculateCart() {
+            const container = document.getElementById('cart-items');
+            const cartCountBadge = document.getElementById('cart-count-badge');
+            
+            cartCountBadge.innerText = `${cart.length} Item`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center text-slate-500 py-12">
+                      <i data-lucide="shopping-bag" class="text-slate-700 w-12 h-12 stroke-1 mb-2"></i>
+                      <p class="text-sm">Belum ada barang di keranjang.</p>
+                      <p class="text-xs mt-1">Tekan tombol (+) pada katalog barang.</p>
+                    </div>
+                `;
+                document.getElementById('cart-subtotal').innerText = 'Rp 0';
+                document.getElementById('cart-tax').innerText = 'Rp 0';
+                document.getElementById('cart-grandtotal').innerText = 'Rp 0';
+                document.getElementById('cash-change-container').classList.add('hidden');
+                
+                // Disable Checkout Button
+                const btn = document.getElementById('btn-checkout');
+                btn.disabled = true;
+                btn.className = "w-full py-3.5 rounded-xl font-bold transition flex items-center justify-center space-x-2 text-sm bg-slate-850 text-slate-600 cursor-not-allowed shadow-none";
+                lucide.createIcons();
+                return;
+            }
+
+            let subtotal = 0;
+            const itemsListHtml = cart.map(item => {
+                const isWholesale = customerType === 'Reseller' || item.quantity >= item.minWholesale;
+                const priceToUse = isWholesale ? item.wholesalePrice : item.price;
+                const totalItemPrice = priceToUse * item.quantity;
+                subtotal += totalItemPrice;
+
+                return `
+                    <div class="bg-slate-850 p-3 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="font-semibold text-sm text-white line-clamp-1">${item.name}</h5>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Rp ${priceToUse.toLocaleString('id-ID')} / ${item.unit}
+                                    ${isWholesale ? '<span class="ml-2 text-[10px] bg-emerald-500/10 text-emerald-400 font-extrabold uppercase px-1 py-0.5 rounded">Grosir</span>' : ''}
+                                </p>
+                            </div>
+                            <button onclick="removeFromCart('${item.id}')" class="text-slate-500 hover:text-rose-400 transition">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1 border-t border-slate-800/40">
+                            <!-- Qty Controls -->
+                            <div class="flex items-center space-x-1.5 bg-slate-800 rounded-lg p-1 border border-slate-700">
+                                <button onclick="updateCartQty('${item.id}', -1)" class="p-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600">
+                                    <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <span class="w-8 text-center text-xs font-bold text-white font-mono">${item.quantity}</span>
+                                <button onclick="updateCartQty('${item.id}', 1)" class="p-1 rounded bg-slate-700 text-slate-300 hover:bg-slate-600">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+
+                            <span class="font-bold text-sm text-white font-mono">
+                                Rp ${totalItemPrice.toLocaleString('id-ID')}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = itemsListHtml;
+
+            // Calculations
+            const discPercent = parseFloat(document.getElementById('cart-discount-input').value) || 0;
+            const discountAmount = Math.round(subtotal * (discPercent / 100));
+            const taxAmount = Math.round((subtotal - discountAmount) * 0.11);
+            const grandTotal = subtotal - discountAmount + taxAmount;
+
+            currentTotals = { subtotal, discount: discountAmount, tax: taxAmount, grandTotal };
+
+            document.getElementById('cart-subtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('cart-tax').innerText = `Rp ${taxAmount.toLocaleString('id-ID')}`;
+            document.getElementById('cart-grandtotal').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+            // Cash and Change calculations
+            const cashPaid = parseFloat(document.getElementById('cash-received-amount').value) || 0;
+            const changeContainer = document.getElementById('cash-change-container');
+            const changeDisplay = document.getElementById('cash-change');
+            
+            let isPaymentValid = true;
+            if (paymentMethod === 'Tunai') {
+                if (cashPaid >= grandTotal) {
+                    changeContainer.classList.remove('hidden');
+                    changeDisplay.innerText = `Rp ${(cashPaid - grandTotal).toLocaleString('id-ID')}`;
+                } else {
+                    changeContainer.classList.add('hidden');
+                    isPaymentValid = false;
+                }
+            } else {
+                changeContainer.classList.add('hidden');
+            }
+
+            // Checkout button validation state
+            const btn = document.getElementById('btn-checkout');
+            if (isPaymentValid) {
+                btn.disabled = false;
+                btn.className = "w-full py-3.5 rounded-xl font-bold transition-all flex items-center justify-center space-x-2 text-sm bg-emerald-500 text-slate-950 hover:bg-emerald-400 hover:scale-[1.02] shadow-xl shadow-emerald-500/10";
+            } else {
+                btn.disabled = true;
+                btn.className = "w-full py-3.5 rounded-xl font-bold transition flex items-center justify-center space-x-2 text-sm bg-slate-850 text-slate-600 cursor-not-allowed shadow-none";
+            }
+
+            lucide.createIcons();
+        }
+
+        function processCheckout() {
+            if (cart.length === 0) return;
+
+            const cashPaid = parseFloat(document.getElementById('cash-received-amount').value) || 0;
+            if (paymentMethod === 'Tunai' && cashPaid < currentTotals.grandTotal) {
+                triggerToast("Uang bayar masih kurang!", "error");
+                return;
+            }
+
+            // Update Stok
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.id);
+                if (product) {
+                    product.stock = Math.max(0, product.stock - item.quantity);
+                }
+            });
+
+            // Create Transaction Object
+            const newTrx = {
+                id: 'TRX-' + Date.now(),
+                date: new Date().toLocaleString('id-ID'),
+                customerType,
+                items: cart.map(item => {
+                    const isWholesale = customerType === 'Reseller' || item.quantity >= item.minWholesale;
+                    const finalUnitPrice = isWholesale ? item.wholesalePrice : item.price;
+                    return {
+                        name: item.name,
+                        unit: item.unit,
+                        quantity: item.quantity,
+                        finalUnitPrice: finalUnitPrice,
+                        totalItemPrice: finalUnitPrice * item.quantity
+                    };
+                }),
+                subtotal: currentTotals.subtotal,
+                discountAmount: currentTotals.discount,
+                taxAmount: currentTotals.tax,
+                grandTotal: currentTotals.grandTotal,
+                paymentMethod,
+                paidAmount: paymentMethod === 'Tunai' ? cashPaid : currentTotals.grandTotal,
+                changeAmount: paymentMethod === 'Tunai' ? Math.max(0, cashPaid - currentTotals.grandTotal) : 0
+            };
+
+            transactions.unshift(newTrx);
+            updateAppMetrics();
+
+            // Open Struk Modal
+            showReceipt(newTrx);
+
+            // Clean cart & resets
+            cart = [];
+            document.getElementById('cash-received-amount').value = '';
+            document.getElementById('cart-discount-input').value = '0';
+            calculateCart();
+            triggerToast("Transaksi Sukses Diproses!");
+        }
+
+        // === TAB 3: MANAJEMEN STOK (INVENTORY) ===
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-table-body');
+            tbody.innerHTML = products.map(prod => {
+                const stockBadgeClass = prod.stock <= 10 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-slate-800 text-emerald-400 border border-slate-700';
+                
+                return `
+                    <tr class="hover:bg-slate-800/40 transition">
+                        <td class="py-4 px-6">
+                            <div>
+                                <span class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider">${prod.category}</span>
+                                <h5 class="font-bold text-white text-sm mt-0.5">${prod.name}</h5>
+                                <p class="text-xs text-slate-500 mt-0.5 line-clamp-1 italic">${prod.description || 'Tidak ada deskripsi.'}</p>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 font-medium text-slate-300">
+                            <div>
+                                <p class="font-bold">${prod.size || '-'}</p>
+                                <span class="text-xs text-slate-500 font-normal">per ${prod.unit}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <span class="inline-block font-mono font-bold text-xs px-2.5 py-1 rounded-lg ${stockBadgeClass}">
+                                ${prod.stock} ${prod.unit}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-right font-mono font-semibold text-white">
+                            Rp ${prod.price.toLocaleString('id-ID')}
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <div class="font-mono">
+                                <p class="font-semibold text-emerald-400">Rp ${prod.wholesalePrice.toLocaleString('id-ID')}</p>
+                                <span class="text-[10px] text-slate-500 font-normal">Min. ${prod.minWholesale} ${prod.unit}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button 
+                                  onclick="openProductModal('${prod.id}')"
+                                  class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg transition"
+                                  title="Ubah Detail Produk"
+                                >
+                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                </button>
+                                <button 
+                                  onclick="deleteProduct('${prod.id}')"
+                                  class="bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-400 p-2 rounded-lg transition"
+                                  title="Hapus Produk"
+                                >
+                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function openProductModal(productId = null) {
+            const modal = document.getElementById('product-modal');
+            const title = document.getElementById('product-modal-title');
+            
+            // Elements form
+            const formId = document.getElementById('form-product-id');
+            const formName = document.getElementById('form-product-name');
+            const formCategory = document.getElementById('form-product-category');
+            const formSize = document.getElementById('form-product-size');
+            const formStock = document.getElementById('form-product-stock');
+            const formUnit = document.getElementById('form-product-unit');
+            const formPrice = document.getElementById('form-product-price');
+            const formWholesale = document.getElementById('form-product-wholesale');
+            const formMinWholesale = document.getElementById('form-product-min-wholesale');
+            const formDesc = document.getElementById('form-product-desc');
+
+            if (productId) {
+                // Edit Mode
+                const product = products.find(p => p.id === productId);
+                if (!product) return;
+
+                title.innerText = "Ubah Detail Produk Plastik";
+                formId.value = product.id;
+                formName.value = product.name;
+                formCategory.value = product.category;
+                formSize.value = product.size;
+                formStock.value = product.stock;
+                formUnit.value = product.unit;
+                formPrice.value = product.price;
+                formWholesale.value = product.wholesalePrice;
+                formMinWholesale.value = product.minWholesale;
+                formDesc.value = product.description;
+            } else {
+                // Add Mode
+                title.innerText = "Tambah Produk Plastik Baru";
+                formId.value = '';
+                formName.value = '';
+                formCategory.value = 'Kresek';
+                formSize.value = '';
+                formStock.value = '10';
+                formUnit.value = 'Pack';
+                formPrice.value = '5000';
+                formWholesale.value = '4500';
+                formMinWholesale.value = '10';
+                formDesc.value = '';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+
+            const formId = document.getElementById('form-product-id').value;
+            const formName = document.getElementById('form-product-name').value;
+            const formCategory = document.getElementById('form-product-category').value;
+            const formSize = document.getElementById('form-product-size').value;
+            const formStock = parseInt(document.getElementById('form-product-stock').value) || 0;
+            const formUnit = document.getElementById('form-product-unit').value;
+            const formPrice = parseInt(document.getElementById('form-product-price').value) || 0;
+            const formWholesale = parseInt(document.getElementById('form-product-wholesale').value) || 0;
+            const formMinWholesale = parseInt(document.getElementById('form-product-min-wholesale').value) || 1;
+            const formDesc = document.getElementById('form-product-desc').value;
+
+            if (formId) {
+                // Update
+                const index = products.findIndex(p => p.id === formId);
+                if (index !== -1) {
+                    products[index] = {
+                        id: formId,
+                        name: formName,
+                        category: formCategory,
+                        size: formSize,
+                        stock: formStock,
+                        unit: formUnit,
+                        price: formPrice,
+                        wholesalePrice: formWholesale,
+                        minWholesale: formMinWholesale,
+                        description: formDesc
+                    };
+                    triggerToast("Produk berhasil diperbarui!");
+                }
+            } else {
+                // New
+                const newProduct = {
+                    id: 'p-' + Date.now(),
+                    name: formName,
+                    category: formCategory,
+                    size: formSize,
+                    stock: formStock,
+                    unit: formUnit,
+                    price: formPrice,
+                    wholesalePrice: formWholesale,
+                    minWholesale: formMinWholesale,
+                    description: formDesc
+                };
+                products.push(newProduct);
+                triggerToast("Produk baru ditambahkan!");
+            }
+
+            updateAppMetrics();
+            closeProductModal();
+            renderInventoryTable();
+        }
+
+        function deleteProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            // In-app custom confirmation (rather than browser blocks/alert)
+            const confirmation = confirm(`Yakin ingin menghapus ${product.name} dari database?`);
+            if (confirmation) {
+                products = products.filter(p => p.id !== productId);
+                updateAppMetrics();
+                renderInventoryTable();
+                triggerToast("Produk dihapus", "info");
+            }
+        }
+
+        // === TAB 4: RIWAYAT TRANSAKSI (HISTORY) ===
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            
+            if (transactions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-500">
+                            <i data-lucide="folder-open" class="w-12 h-12 stroke-1 mx-auto mb-2 text-slate-700"></i>
+                            <p class="text-sm">Belum ada transaksi terekam.</p>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            tbody.innerHTML = transactions.map(trx => {
+                const itemsStr = trx.items.map(it => `<div class="flex justify-between font-medium"><span>${it.name} x${it.quantity}</span></div>`).join('');
+                const badgeClass = trx.customerType === 'Reseller' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300 border border-slate-700';
+
+                return `
+                    <tr class="hover:bg-slate-800/45 transition">
+                        <td class="py-4 px-6">
+                            <div>
+                                <span class="font-mono font-bold text-white text-sm">${trx.id}</span>
+                                <p class="text-xs text-slate-500 mt-0.5">${trx.date}</p>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full ${badgeClass}">
+                                ${trx.customerType}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="max-w-xs space-y-0.5 text-xs text-slate-300">
+                                ${itemsStr}
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-medium">
+                                ${trx.paymentMethod}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-right font-mono font-bold text-emerald-400 text-sm">
+                            Rp ${trx.grandTotal.toLocaleString('id-ID')}
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <button 
+                              onclick="reprintReceipt('${trx.id}')"
+                              class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg transition"
+                              title="Cetak Nota Kembali"
+                            >
+                                <i data-lucide="printer" class="w-4.5 h-4.5"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function reprintReceipt(trxId) {
+            const trx = transactions.find(t => t.id === trxId);
+            if (!trx) return;
+            showReceipt(trx);
+        }
+
+        // === STRUK NOTA DRAWING ===
+        function showReceipt(trx) {
+            const container = document.getElementById('receipt-modal-content');
+            
+            const itemsHtml = trx.items.map(item => `
+                <div class="mb-1.5">
+                    <div class="flex justify-between font-bold">
+                        <span>${item.name}</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-600">
+                        <span>${item.quantity} x Rp ${item.finalUnitPrice.toLocaleString('id-ID')}</span>
+                        <span>Rp ${item.totalItemPrice.toLocaleString('id-ID')}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const discountRow = trx.discountAmount > 0 ? `
+                <div class="flex justify-between text-rose-600">
+                    <span>Diskon Tambahan:</span>
+                    <span>-Rp ${trx.discountAmount.toLocaleString('id-ID')}</span>
+                </div>
+            ` : '';
+
+            container.innerHTML = `
+                <div class="font-mono text-xs text-slate-900">
+                  <div class="text-center space-y-1 mb-4">
+                    <h4 class="font-bold text-base uppercase tracking-tight">TOKO PLASTIK JAYA</h4>
+                    <p class="text-[10px]">Jl. Raya Packaging No. 12, Kota Besar</p>
+                    <p class="text-[10px]">Hubungi: 0812-3456-7890</p>
+                    <div class="border-b border-dashed border-slate-400 my-2"></div>
+                  </div>
+
+                  <div class="space-y-0.5 text-[10px] mb-3">
+                    <p>No Nota : ${trx.id}</p>
+                    <p>Waktu   : ${trx.date}</p>
+                    <p>Kasir   : Owner Toko Jaya</p>
+                    <p>Tipe    : Pelanggan ${trx.customerType}</p>
+                    <div class="border-b border-dashed border-slate-400 my-2"></div>
+                  </div>
+
+                  <!-- Item Belanja -->
+                  <div class="mb-4">
+                    ${itemsHtml}
+                    <div class="border-b border-dashed border-slate-400 my-2"></div>
+                  </div>
+
+                  <!-- Rincian Biaya -->
+                  <div class="space-y-1 text-right text-[10px]">
+                    <div class="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span>Rp ${trx.subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                    ${discountRow}
+                    <div class="flex justify-between">
+                      <span>PPN (11%):</span>
+                      <span>Rp ${trx.taxAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-xs pt-1 border-t border-dotted border-slate-400">
+                      <span>Total Bayar:</span>
+                      <span>Rp ${trx.grandTotal.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="border-b border-dashed border-slate-400 my-2"></div>
+                    
+                    <div class="flex justify-between">
+                      <span>Pembayaran:</span>
+                      <span>${trx.paymentMethod}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Diterima:</span>
+                      <span>Rp ${trx.paidAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                    <div class="flex justify-between font-bold">
+                      <span>Kembalian:</span>
+                      <span>Rp ${trx.changeAmount.toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+
+                  <div class="text-center mt-6 space-y-1">
+                    <p class="font-bold text-[10px]">TERIMA KASIH ATAS KUNJUNGAN ANDA</p>
+                    <p class="text-[9px]">Barang yang telah dibeli tidak dapat ditukar/dikembalikan.</p>
+                  </div>
+                </div>
+            `;
+
+            document.getElementById('receipt-modal').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+        }
+
+
+        // === TAB 5: GEMINI AI PLASTIGO INTEGRATION ===
+        async function handleSendAiMessage(event) {
+            if (event) event.preventDefault();
+
+            const input = document.getElementById('ai-user-input');
+            const prompt = input.value.trim();
+            if (!prompt) return;
+
+            appendChatMessage('user', prompt);
+            input.value = '';
+
+            await fetchAiResponse(prompt);
+        }
+
+        function sendQuickPrompt(prompt) {
+            appendChatMessage('user', prompt);
+            fetchAiResponse(prompt);
+        }
+
+        function appendChatMessage(role, text) {
+            const viewport = document.getElementById('ai-chat-viewport');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            if (role === 'user') {
+                msgDiv.innerHTML = `
+                    <div class="max-w-[75%] rounded-2xl p-4 text-sm leading-relaxed bg-indigo-600 text-white rounded-tr-none">
+                        <div class="flex items-center space-x-1.5 mb-1.5">
+                            <span class="text-[10px] font-bold text-indigo-200">KASIR / OWNER</span>
+                        </div>
+                        <p class="text-[13px] md:text-sm whitespace-pre-line">${text}</p>
+                    </div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="max-w-[75%] rounded-2xl p-4 text-sm leading-relaxed bg-slate-900 border border-slate-800 text-slate-100 rounded-tl-none shadow-lg">
+                        <div class="flex items-center space-x-1.5 mb-1.5">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+                            <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">PlastiGo Intelligence</span>
+                        </div>
+                        <p class="text-[13px] md:text-sm whitespace-pre-line">${text}</p>
+                    </div>
+                `;
+            }
+
+            viewport.appendChild(msgDiv);
+            lucide.createIcons();
+            viewport.scrollTop = viewport.scrollHeight;
+        }
+
+        function appendAiLoadingIndicator() {
+            const viewport = document.getElementById('ai-chat-viewport');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = "ai-loading-bubble";
+            loadingDiv.className = "flex justify-start";
+            loadingDiv.innerHTML = `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl rounded-tl-none p-4 max-w-[70%]">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-100"></div>
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce delay-200"></div>
+                        <span class="text-xs text-slate-400 pl-1 font-medium">Asisten AI sedang menyusun rekomendasi...</span>
+                    </div>
+                </div>
+            `;
+            viewport.appendChild(loadingDiv);
+            viewport.scrollTop = viewport.scrollHeight;
+        }
+
+        function removeAiLoadingIndicator() {
+            const indicator = document.getElementById('ai-loading-bubble');
+            if (indicator) indicator.remove();
+        }
+
+        async function fetchAiResponse(userPrompt) {
+            appendAiLoadingIndicator();
+
+            const systemPrompt = `
+                Anda adalah "PlastiGo AI Consultant", asisten cerdas ahli dalam kemasan plastik, kertas, & mika untuk bisnis kuliner, UMKM, dan ritel.
+                Anda berbicara dalam Bahasa Indonesia yang profesional, ramah, dan solutif.
+                Berikan rekomendasi produk yang tepat sesuai kebutuhan pengguna.
+                Pilihan jenis plastik umum yang Anda ketahui:
+                1. HDPE (High Density Polyethylene): Kresek belanja, kuat, buram, aman makanan (tahan panas sedang).
+                2. LDPE (Low Density Polyethylene): Plastik packing baju, elastis, agak lentur.
+                3. PP (Polypropylene): Sangat bening, kaku, tahan panas tinggi, cocok untuk snack garing atau plastik kiloan sayur/lauk kuah hangat.
+                4. OPP (Oriented Polypropylene): Sangat bening mengkilap, ada lem segel, kaku, cocok untuk hijab, baju, kue satuan.
+                5. PE (Polyethylene): Plastik es batu, elastis tinggi, tahan dingin/beku.
+                6. Mika & Standing Pouch: Sangat premium untuk makanan saji dan kemasan produk UMKM kekinian.
+
+                Berikan rekomendasi praktis, ringkas, dan ramah dengan format poin-poin tebal/bullet points jika diperlukan.
+            `;
+
+            // Exponential backoff retry helper
+            const fetchWithRetry = async (url, options, retries = 5, delay = 1000) => {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (retries > 0) {
+                        await new Promise(res => setTimeout(res, delay));
+                        return fetchWithRetry(url, options, retries - 1, delay * 2);
+                    }
+                    throw error;
+                }
+            };
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [
+                        {
+                            parts: [{ text: userPrompt }]
+                        }
+                    ],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    }
+                };
+
+                const result = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, saya tidak dapat memproses jawaban saat ini.";
+                removeAiLoadingIndicator();
+                appendChatMessage('assistant', text);
+            } catch (err) {
+                console.error(err);
+                removeAiLoadingIndicator();
+                appendChatMessage('assistant', "Aduh, koneksi saya sedang terputus atau API Key bermasalah. Pastikan internet Anda aktif dan silakan coba beberapa saat lagi!");
+            }
+        }
+    </script>
 </body>
 </html>
+
+```
